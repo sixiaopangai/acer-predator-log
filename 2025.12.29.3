@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>TB4 动态交互实验室</title>
+    <style>
+        :root { --neon-blue: #00f3ff; --neon-green: #0f0; --bg-dark: #0a0a0c; }
+        body { background: var(--bg-dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
+        
+        /* 标题和背景提示 */
+        .info { position: absolute; top: 20px; width: 100%; text-align: center; pointer-events: none; z-index: 100; }
+        h1 { text-shadow: 0 0 10px var(--neon-blue); margin: 0; }
+        
+        /* 外设节点 */
+        .node {
+            position: absolute; padding: 10px 15px; border: 1px solid var(--neon-green);
+            background: rgba(0, 255, 0, 0.1); border-radius: 4px; z-index: 50;
+        }
+
+        /* 鼠标跟随的“中心设备”指示器 */
+        #laptop-pointer {
+            position: absolute; width: 120px; height: 60px;
+            border: 2px solid var(--neon-blue); background: rgba(0, 243, 255, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; pointer-events: none; transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px var(--neon-blue); z-index: 60;
+        }
+
+        svg { position: absolute; width: 100vw; height: 100vh; top: 0; left: 0; }
+        .data-line { fill: none; stroke: var(--neon-blue); stroke-width: 2; stroke-dasharray: 10, 5; animation: flow 1s linear infinite; opacity: 0.5; }
+        @keyframes flow { from { stroke-dashoffset: 30; } to { stroke-dashoffset: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="info">
+        <h1>Thunderbolt 4 动态律动拓扑</h1>
+        <p>移动鼠标：模拟 Acer Predator 移动中的数据重定向</p>
+    </div>
+
+    <div id="laptop-pointer">
+        <div style="text-align: center; font-size: 0.8em;">
+            <strong>Predator</strong><br>TB4 Link
+        </div>
+    </div>
+
+    <div class="node" style="top: 20%; left: 20%;" id="n1">🖥️ 4K Display</div>
+    <div class="node" style="top: 20%; right: 20%;" id="n2">💾 40Gbps SSD</div>
+    <div class="node" style="bottom: 20%; left: 20%;" id="n3">🎮 External GPU</div>
+    <div class="node" style="bottom: 20%; right: 20%;" id="n4">🔌 TB4 Dock</div>
+
+    <svg id="svg-canvas">
+        <path id="path1" class="data-line"></path>
+        <path id="path2" class="data-line"></path>
+        <path id="path3" class="data-line"></path>
+        <path id="path4" class="data-line"></path>
+    </svg>
+
+    <script>
+        const pointer = document.getElementById('laptop-pointer');
+        const paths = [
+            document.getElementById('path1'),
+            document.getElementById('path2'),
+            document.getElementById('path3'),
+            document.getElementById('path4')
+        ];
+        const nodes = [
+            document.getElementById('n1'),
+            document.getElementById('n2'),
+            document.getElementById('n3'),
+            document.getElementById('n4')
+        ];
+
+        // 核心变量：目标位置（鼠标）和当前位置（缓动）
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentX = mouseX;
+        let currentY = mouseY;
+
+        // 1. 捕捉鼠标位置
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // 2. 渲染循环（实现律动感的关键）
+        function animate() {
+            // 缓动公式：当前值 = 当前值 + (目标值 - 当前值) * 灵敏度
+            // 这个 0.1 就是律动感的来源，数值越小越“粘稠”，越大越灵敏
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+
+            // 更新中心指示器位置
+            pointer.style.left = currentX + 'px';
+            pointer.style.top = currentY + 'px';
+
+            // 更新四条连线的路径
+            nodes.forEach((node, index) => {
+                const rect = node.getBoundingClientRect();
+                const nodeX = rect.left + rect.width / 2;
+                const nodeY = rect.top + rect.height / 2;
+                
+                // 设置 SVG 路径：从当前的缓动中心点移动到固定节点
+                paths[index].setAttribute('d', `M${currentX},${currentY} L${nodeX},${nodeY}`);
+            });
+
+            // 循环调用，保持流畅
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
