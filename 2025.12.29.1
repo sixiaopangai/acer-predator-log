@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>TB4 高速传输实验室</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-green: #0f0;
+            --bg-dark: #0a0a0c;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            overflow-x: hidden;
+        }
+
+        .container { position: relative; width: 600px; height: 400px; }
+
+        /* 中心设备：Acer Predator */
+        .laptop {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border: 2px solid var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 20px var(--neon-blue);
+            z-index: 10;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        /* 外设节点样式 */
+        .node {
+            position: absolute;
+            padding: 10px 15px;
+            border: 1px solid var(--neon-green);
+            background: rgba(0, 255, 0, 0.05);
+            font-size: 0.9em;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .node:hover { background: rgba(0, 255, 0, 0.2); box-shadow: 0 0 15px var(--neon-green); }
+
+        /* 节点位置 */
+        #monitor { top: 10%; left: 10%; }
+        #ssd { top: 10%; right: 10%; }
+        #gpu { bottom: 10%; left: 10%; }
+        #dock { bottom: 10%; right: 10%; }
+
+        /* 连接线动画 */
+        svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        .data-line {
+            fill: none;
+            stroke: var(--neon-blue);
+            stroke-width: 2;
+            stroke-dasharray: 10, 5;
+            animation: flow 1s linear infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes flow {
+            from { stroke-dashoffset: 30; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        h1 { text-shadow: 0 0 10px var(--neon-blue); margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+
+    <h1>Thunderbolt 4 拓扑实时映射</h1>
+
+    <div class="container">
+        <svg>
+            <path class="data-line" d="M300,200 L100,60" />  <path class="data-line" d="M300,200 L500,60" />  <path class="data-line" d="M300,200 L100,340" /> <path class="data-line" d="M300,200 L500,340" /> </svg>
+
+        <div class="laptop">
+            <strong>Acer Predator</strong><br>
+            PHN16-71<br>
+            <span style="font-size: 0.7em; color: var(--neon-blue);">TB4 Controller: Active</span>
+        </div>
+
+        <div class="node" id="monitor">🖥️ Dual 4K Monitors</div>
+        <div class="node" id="ssd">💾 NVMe SSD (40Gbps)</div>
+        <div class="node" id="gpu">🎮 External GPU</div>
+        <div class="node" id="dock">🔌 10-in-1 Dock</div>
+    </div>
+
+    <p style="margin-top: 50px; color: #888;">> 数据正在通过单路 32Gbps PCIe 通道传输...</p>
+
+</body>
+</html>
